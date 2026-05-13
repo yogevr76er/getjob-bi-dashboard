@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>getjob BI v9 — LIVE</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f172a;color:#f1f5f9}
+.hdr{background:linear-gradient(135deg,#1e3a5f,#0f172a);padding:10px 20px;border-bottom:1px solid #475569;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.hdr h1{font-size:17px}.hdr h1 b{color:#60a5fa;font-weight:400}
+.stats{display:flex;gap:6px;font-size:11px;flex-wrap:wrap}
+.stat{background:#334155;padding:2px 9px;border-radius:14px;display:flex;align-items:center;gap:4px}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+.filters{background:#1e293b;padding:8px 16px;border-bottom:1px solid #475569;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+input[type=text]{background:#0f172a;border:1px solid #475569;border-radius:6px;padding:6px 10px;color:#f1f5f9;font-size:12px;outline:none}
+input[type=text]:focus{border-color:#3b82f6}
+input[type=text]::placeholder{color:#64748b}
+.search-main{width:260px;font-size:13px}
+select{background:#0f172a;border:1px solid #475569;border-radius:6px;padding:6px 8px;color:#f1f5f9;font-size:12px;outline:none;cursor:pointer}
+select option{background:#0f172a;color:#f1f5f9}
+.btn{background:#0f172a;border:1px solid #475569;border-radius:6px;padding:5px 11px;color:#94a3b8;font-size:12px;cursor:pointer}
+.btn:hover{border-color:#3b82f6;color:#f1f5f9}
+.btn.on{background:#3b82f6;border-color:#3b82f6;color:#fff}
+.chk{display:flex;align-items:center;gap:4px;font-size:11px;color:#94a3b8;cursor:pointer}
+.chk input{accent-color:#f97316}
+.clear-btn{background:0;border:1px solid #ef4444;border-radius:6px;padding:5px 11px;color:#ef4444;font-size:12px;cursor:pointer}
+.clear-btn:hover{background:#ef4444;color:#fff}
+.csv-btn{background:#22c55e;color:#fff;border:0;border-radius:6px;padding:5px 13px;font-size:12px;cursor:pointer;font-weight:600}
+.fbox{display:flex;align-items:center;gap:4px;background:rgba(59,130,246,.1);padding:4px 8px;border-radius:6px;border:1px solid rgba(59,130,246,.25)}
+.fbox label{font-size:10px;color:#60a5fa;font-weight:600;white-space:nowrap}
+.fbox input{width:110px;border:0;background:transparent;color:#f1f5f9;font-size:12px;outline:none;padding:2px 4px}
+.fbox input::placeholder{color:#475569}
+.fbox .cnt{font-size:9px;color:#22c55e;min-width:20px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:#1e3a5f;padding:10px 8px;text-align:right;font-weight:700;font-size:11px;color:#60a5fa;border-bottom:3px solid #3b82f6;border-top:3px solid #3b82f6;white-space:nowrap;cursor:pointer;user-select:none}
+th:hover{color:#f1f5f9}
+td{padding:6px 8px;border-bottom:1px solid rgba(71,85,105,.25);vertical-align:middle;max-width:180px}
+tr:hover td{background:rgba(59,130,246,.06)}
+tr{cursor:pointer}
+.tag{display:inline-block;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:600;white-space:nowrap}
+.t-new{background:rgba(34,197,94,.15);color:#22c55e}
+.t-act{background:rgba(59,130,246,.15);color:#60a5fa}
+.t-arc{background:rgba(148,163,184,.15);color:#94a3b8}
+.t-min{background:rgba(249,115,22,.2);color:#f97316;border:1px solid rgba(249,115,22,.4);font-size:9px}
+.t-rgn{background:rgba(168,85,247,.15);color:#a855f7;font-size:10px}
+.t-bday{background:rgba(236,72,153,.2);color:#ec4899;font-size:9px;border:1px solid rgba(236,72,153,.3)}
+.t-spec{background:rgba(6,182,212,.15);color:#06b6d4;font-size:10px}
+.nm{font-weight:600;white-space:nowrap}
+.note-cell{max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#eab308}
+.pref{font-size:10px;color:#06b6d4}.block{font-size:10px;color:#ef4444}.ai-p{font-size:10px;color:#ec4899}
+.shift-i{font-size:10px;color:#06b6d4;white-space:nowrap}
+.idc{font-family:monospace;font-size:11px;color:#94a3b8}
+.wa-btn{background:#25D366;color:#fff;border:0;border-radius:5px;padding:3px 8px;font-size:11px;cursor:pointer;text-decoration:none}
+.pager{display:flex;justify-content:center;align-items:center;gap:6px;padding:10px;background:#1e293b;border-top:1px solid #475569;position:sticky;bottom:0;z-index:50}
+.pg-btn{background:#0f172a;border:1px solid #475569;border-radius:5px;padding:4px 11px;color:#f1f5f9;cursor:pointer;font-size:12px}
+.pg-btn:hover{border-color:#3b82f6}
+.pg-btn.on{background:#3b82f6;border-color:#3b82f6}
+.pg-btn:disabled{opacity:.4;cursor:not-allowed}
+.pg-info{color:#94a3b8;font-size:12px}
+.overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:300;justify-content:center;align-items:center}
+.overlay.show{display:flex}
+.modal{background:#1e293b;border-radius:14px;padding:20px;max-width:800px;width:95%;max-height:90vh;overflow-y:auto;border:1px solid #475569;position:relative}
+.modal h2{font-size:18px;margin-bottom:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.close-btn{position:absolute;top:14px;left:14px;background:0;border:0;color:#94a3b8;font-size:22px;cursor:pointer}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field{background:#0f172a;padding:8px 12px;border-radius:6px}
+.field label{display:block;font-size:10px;color:#94a3b8;margin-bottom:3px}
+.field .val{font-size:13px}
+.note-box{background:#0f172a;padding:12px;border-radius:6px;grid-column:1/-1;white-space:pre-wrap;line-height:1.5}
+.note-box label{display:block;font-size:10px;color:#94a3b8;margin-bottom:5px}
+.actions{display:flex;gap:8px;margin-top:14px;justify-content:flex-end;flex-wrap:wrap}
+.s-card{background:#0f172a;border:1px solid #475569;border-radius:8px;padding:12px;grid-column:1/-1;margin-top:4px}
+.s-card h3{font-size:14px;margin-bottom:8px;color:#06b6d4}
+.s-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:6px;font-size:12px}
+.s-row .lbl{color:#94a3b8;min-width:80px}
+.s-row .vl{color:#f1f5f9}
+.cl-list{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.cl-tag{background:#334155;padding:2px 8px;border-radius:10px;font-size:11px;color:#60a5fa}
+.empty{text-align:center;padding:50px;color:#94a3b8;display:none}
+@keyframes fadeOut{0%{opacity:1}70%{opacity:1}100%{opacity:0}} @media(max-width:768px){.hdr{flex-direction:column}.filters{padding:6px 10px}.search-main{width:100%}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <h1>🧠 <b>getjob</b> BI v9 — LIVE</h1>
+  <div class="stats" id="stats"></div>
+</div>
+<div class="filters">
+  <input type="text" class="search-main" id="searchMain" placeholder="🔍 חיפוש: שם, טלפון, ת.ז, הערות, לקוח..." />
+  <div style="display:flex;gap:3px">
+    <button class="btn on" data-s="all">הכל</button>
+    <button class="btn" data-s="חדש">🆕 חדש</button>
+    <button class="btn" data-s="פעיל">✅ פעיל</button>
+    <button class="btn" data-s="בארכיון">📦 ארכיון</button>
+  </div>
+  <select id="filterRegion"><option value="">🗺️ אזור</option>
+    <option value="מרכז">מרכז</option><option value="שרון">שרון</option>
+    <option value="צפון">צפון</option><option value="דרום">דרום</option>
+    <option value="ירושלים">ירושלים</option><option value="שפלה">שפלה</option>
+    <option value="אחר">אחר</option></select>
+  <div class="fbox">
+    <label>👔 עבד/ה כ:</label>
+    <input type="text" id="filterRole" placeholder="מלצר, סייעת..." />
+    <span class="cnt" id="roleCount"></span>
+  </div>
+  <div class="fbox">
+    <label>🏢 עבד/ה אצל:</label>
+    <input type="text" id="filterClient" placeholder="ניוטון, פרימה..." />
+    <span class="cnt" id="clientCount"></span>
+  </div>
+  <select id="filterGender"><option value="">⚥ מין</option><option value="זכר">זכר</option><option value="נקבה">נקבה</option></select>
+  <select id="filterCar"><option value="">🚗 רכב</option><option value="כן">יש</option><option value="לא">אין</option></select>
+  <select id="filterStar"><option value="">⭐ דירוג</option>
+    <option value="5">⭐⭐⭐⭐⭐</option><option value="4">⭐⭐⭐⭐</option>
+    <option value="3">⭐⭐⭐</option><option value="2">⭐⭐</option><option value="1">⭐</option></select>
+  <label class="chk"><input type="checkbox" id="filterBday"/> 🎂 יומהולדת</label>
+  <button class="clear-btn" id="clearAll">🗑️ נקה</button>
+  <button class="csv-btn" id="exportCSV">📥 CSV</button>
+</div>
+<div style="overflow-x:auto">
+  <table>
+    <thead><tr>
+      <th>#</th><th data-sort="n">שם</th><th>סטטוס</th><th>⭐</th><th>📊 התמחות</th><th>משמרות</th>
+      <th data-sort="rg">אזור</th><th data-sort="c">עיר</th><th>ת.ז</th><th>טלפון</th><th>הערות</th>
+      <th>מועדפים</th><th>חסומים</th><th>AI</th><th data-sort="la">פעילות</th><th>📱</th>
+    </tr></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+  <div class="empty" id="empty"><h3>לא נמצאו תוצאות</h3></div>
+</div>
+<div class="pager" id="pager"></div>
+<div class="overlay" id="overlay"><div class="modal" id="modal"></div></div>
+<script>
+let D=[];
+let F=[];
+const PP=50;
+let F=[...D],pg=1,sf=null,sd=1,st='all';
+
+function N(s){
+  if(!s)return'';
+  return s.replace(/[.\/\-״\"'_]/g,'').replace(/\s+/g,' ').trim().toLowerCase();
+}
+function E(s){return s?s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):''}
+function stars(n){return n?'⭐'.repeat(n):''}
+function stag(s){
+  if(s==='חדש')return'<span class="tag t-new">🆕 חדש</span>';
+  if(s==='פעיל')return'<span class="tag t-act">✅ פעיל</span>';
+  return'<span class="tag t-arc">📦 ארכיון</span>';
+}
+
+function _pdt(s){if(!s)return 0;const p=s.match(/(\d{2})\/(\d{2})\/(\d{4})\s*(\d{2}):(\d{2})/);if(!p)return 0;return new Date(+p[3],+p[2]-1,+p[1],+p[4],+p[5]).getTime()}
+function applyFilters(){
+  const q=N(document.getElementById('searchMain').value);
+  const rgn=document.getElementById('filterRegion').value;
+  const role=N(document.getElementById('filterRole').value);
+  const client=N(document.getElementById('filterClient').value);
+  const gen=document.getElementById('filterGender').value;
+  const car=document.getElementById('filterCar').value;
+  const star=document.getElementById('filterStar').value;
+  const bday=document.getElementById('filterBday').checked;
+
+  F=D.filter(d=>{
+    if(st!=='all'&&d.s!==st)return false;
+    if(rgn&&d.rg!==rgn)return false;
+    if(gen&&d.g!==gen)return false;
+    if(car==='כן'&&d.v!=='כן')return false;
+    if(car==='לא'&&d.v==='כן')return false;
+    if(star&&(!d._st||d._st<parseInt(star)))return false;
+    if(bday&&!d.bm)return false;
+    if(role){if(!d._tr)return false;if(!N(d._tr).includes(role))return false;}
+    if(client){if(!d._tc)return false;if(!N(d._tc).includes(client))return false;}
+    if(q){
+      const h=N((d.n||'')+'|'+(d.p||'')+'|'+(d.id||'')+'|'+(d.nt||'')+'|'+(d.c||'')+'|'+(d.r||'')+'|'+(d.e||'')+'|'+(d.cp||'')+'|'+(d.cb||'')+'|'+(d.pf||'')+'|'+(d._tc||'')+'|'+(d._tr||'')+'|'+(d._sp||'')+'|'+(d._sn||''));
+      if(!h.includes(q))return false;
+    }
+    return true;
+  });
+  if(sf){F.sort((a,b)=>{const va=(a[sf]||'').toString();const vb=(b[sf]||'').toString();return va.localeCompare(vb,'he')*sd})}
+  else if(st==='חדש'){F.sort((a,b)=>{const pa=_pdt(a.cr);const pb=_pdt(b.cr);return pb-pa})}
+  pg=1;render();
+  document.getElementById('roleCount').textContent=role?F.length:'';
+  document.getElementById('clientCount').textContent=client?F.length:'';
+}
+
+function render(){
+  const s=(pg-1)*PP,sl=F.slice(s,s+PP),tb=document.getElementById('tbody');
+  if(!sl.length){tb.innerHTML='';document.getElementById('empty').style.display='block';document.getElementById('pager').innerHTML='';updateStats();return}
+  document.getElementById('empty').style.display='none';
+  let h='';
+  sl.forEach((d,i)=>{
+    const num=s+i+1;
+    const mn=d.mn?'<span class="tag t-min">⚠️ קטין</span> ':'';
+    const bd=d.bm?'<span class="tag t-bday">🎂 '+E(d.bd)+'</span> ':'';
+    const nt=d.nt?E(d.nt).substring(0,50)+(d.nt.length>50?'...':''):'-';
+    const cp=d.cp?'<span class="pref">⭐'+E(d.cp).substring(0,30)+'</span>':'-';
+    const cb=d.cb?'<span class="block">🚫'+E(d.cb).substring(0,30)+'</span>':'-';
+    const pf=d.pf?'<span class="ai-p">🤖'+E(d.pf).substring(0,30)+'</span>':'-';
+    const rg=d.rg?'<span class="tag t-rgn">'+E(d.rg)+'</span>':'';
+    const sp=d._sp?'<span class="tag t-spec">'+E(d._sp)+'</span>':'';
+    const sh=d._ts?'<span class="shift-i">'+d._ts+'('+d._th+'h)</span>':'';
+    h+='<tr onclick="showModal('+(s+i)+')"><td>'+num+'</td><td class="nm">'+mn+bd+E(d.n)+'</td><td>'+stag(d.s)+'</td><td>'+stars(d._st)+'</td><td>'+sp+'</td><td>'+sh+'</td><td>'+rg+'</td><td>'+E(d.c||'')+'</td><td class="idc">'+E(d.id||'')+'</td><td style="direction:ltr;text-align:right;font-size:11px">'+E(d.p||'')+'</td><td class="note-cell">'+nt+'</td><td>'+cp+'</td><td>'+cb+'</td><td>'+pf+'</td><td style="font-size:11px">'+E(d.la||'')+'</td><td onclick="event.stopPropagation()"><a class="wa-btn" href="https://wa.me/'+(d.w||'')+'?text='+encodeURIComponent('היי '+d.n+', כאן getjob! 😊')+'" target="_blank">📱</a></td></tr>';
+  });
+  tb.innerHTML=h;renderPager();updateStats();
+}
+
+function updateStats(){
+  const c={t:F.length,n:0,a:0,r:0,m:0,bd:0,sh:0};
+  F.forEach(d=>{if(d.s==='חדש')c.n++;else if(d.s==='פעיל')c.a++;else c.r++;if(d.mn)c.m++;if(d.bm)c.bd++;if(d._ts)c.sh++});
+  document.getElementById('stats').innerHTML=
+    '<div class="stat"><span class="dot" style="background:#f1f5f9"></span>'+c.t+' סה"כ</div>'+
+    '<div class="stat"><span class="dot" style="background:#22c55e"></span>'+c.n+' חדשים</div>'+
+    '<div class="stat"><span class="dot" style="background:#3b82f6"></span>'+c.a+' פעילים</div>'+
+    '<div class="stat"><span class="dot" style="background:#94a3b8"></span>'+c.r+' ארכיון</div>'+
+    '<div class="stat"><span class="dot" style="background:#f97316"></span>'+c.m+' קטינים</div>'+
+    '<div class="stat"><span class="dot" style="background:#ec4899"></span>'+c.bd+' 🎂</div>';
+}
+
+function renderPager(){
+  const tp=Math.ceil(F.length/PP);if(tp<=1){document.getElementById('pager').innerHTML='';return}
+  let h='<button class="pg-btn" onclick="goPage(1)" '+(pg===1?'disabled':'')+'>⏮</button>';
+  h+='<button class="pg-btn" onclick="goPage('+(pg-1)+')" '+(pg===1?'disabled':'')+'>◀</button>';
+  const a=Math.max(1,pg-3),b=Math.min(tp,pg+3);
+  for(let p=a;p<=b;p++)h+='<button class="pg-btn '+(p===pg?'on':'')+'" onclick="goPage('+p+')">'+p+'</button>';
+  h+='<button class="pg-btn" onclick="goPage('+(pg+1)+')" '+(pg===tp?'disabled':'')+'>▶</button>';
+  h+='<button class="pg-btn" onclick="goPage('+tp+')" '+(pg===tp?'disabled':'')+'>⏭</button>';
+  h+='<span class="pg-info">עמוד '+pg+'/'+tp+' ('+F.length+')</span>';
+  document.getElementById('pager').innerHTML=h;
+}
+function goPage(p){const tp=Math.ceil(F.length/PP);pg=Math.max(1,Math.min(tp,p));render();window.scrollTo({top:0,behavior:'smooth'})}
+
+function showModal(idx){
+  const d=F[idx];if(!d)return;
+  const mn=d.mn?'<span class="tag t-min" style="font-size:13px">⚠️ קטין</span>':'';
+  const bd=d.bm?'<span class="tag t-bday" style="font-size:13px">🎂 '+E(d.bd)+'!</span>':'';
+  const hc=d.hc?'✅ '+E(d.hc):(d.mn?'<span style="color:#ef4444;font-weight:bold">❌ חסר!</span>':'-');
+  let h='<button class="close-btn" onclick="closeModal()">✕</button>';
+  h+='<h2>'+E(d.n)+' '+stag(d.s)+' '+stars(d._st)+' '+mn+' '+bd+'</h2>';
+  if(d._ts){
+    h+='<div class="s-card"><h3>📊 פרופיל — '+d._ts+' משמרות</h3>';
+    h+='<div class="s-row"><span class="lbl">🎯 התמחות:</span><span class="vl"><span class="tag t-spec" style="font-size:12px">'+E(d._sp)+'</span></span></div>';
+    h+='<div class="s-row"><span class="lbl">⏱️ שעות:</span><span class="vl">'+d._th+' שעות ב-'+d._ma+' חודשים</span></div>';
+    h+='<div class="s-row"><span class="lbl">💰 שכר:</span><span class="vl">₪'+(d._tsal||0).toLocaleString()+'</span></div>';
+    h+='<div class="s-row"><span class="lbl">📈 אמינות:</span><span class="vl" style="color:'+(d._rl>=70?'#22c55e':d._rl>=40?'#eab308':'#ef4444')+'">'+d._rl+'%</span></div>';
+    h+='<div class="s-row"><span class="lbl">🏢 לקוחות:</span><span class="vl">'+d._uc+' ייחודיים</span></div>';
+    if(d._tc){h+='<div class="s-row"><span class="lbl">🔝 טופ:</span><div class="cl-list">';d._tc.split(',').forEach(c=>h+='<span class="cl-tag">'+E(c.trim())+'</span>');h+='</div></div>'}
+    if(d._tr)h+='<div class="s-row"><span class="lbl">👔 עבד/ה כ:</span><span class="vl">'+E(d._tr)+'</span></div>';
+    if(d._sn)h+='<div class="s-row"><span class="lbl">📝 הערות:</span><span class="vl" style="color:#eab308">'+E(d._sn)+'</span></div>';
+    if(d._san)h+='<div class="s-row"><span class="lbl">💬 שכר:</span><span class="vl" style="color:#f97316">'+E(d._san)+'</span></div>';
+    h+='</div>';
+  }
+  h+='<div class="grid">';
+  h+='<div class="field"><label>📱 טלפון</label><div class="val" style="direction:ltr;text-align:right">'+(d.p||'-')+'</div></div>';
+  h+='<div class="field"><label>🪪 ת.ז</label><div class="val idc">'+(d.id||'-')+'</div></div>';
+  h+='<div class="field"><label>📧 אימייל</label><div class="val">'+(d.e||'-')+'</div></div>';
+  h+='<div class="field"><label>🎂 תאריך לידה</label><div class="val">'+(d.bdf||'-')+'</div></div>';
+  h+='<div class="field"><label>🗺️ אזור</label><div class="val">'+(d.rg?'<span class="tag t-rgn">'+E(d.rg)+'</span>':'-')+'</div></div>';
+  h+='<div class="field"><label>🏙️ עיר</label><div class="val">'+(d.c||'-')+'</div></div>';
+  h+='<div class="field"><label>👔 תפקידים רשומים</label><div class="val">'+(d.r||'-')+'</div></div>';
+  h+='<div class="field"><label>🚗 רכב</label><div class="val">'+(d.v||'-')+'</div></div>';
+  h+='<div class="field"><label>⚥ מין</label><div class="val">'+(d.g==='male'?'זכר':d.g==='female'?'נקבה':'-')+'</div></div>';
+  h+='<div class="field"><label>🏢 סניף</label><div class="val">'+(d.br||'-')+'</div></div>';
+  h+='<div class="field"><label>📅 נוצר</label><div class="val">'+(d.cr||'-')+'</div></div>';
+  h+='<div class="field"><label>⏰ פעילות</label><div class="val">'+(d.la||'-')+'</div></div>';
+  h+='<div class="field"><label>💼 ניסיון</label><div class="val">'+(d.ex||'-')+'</div></div>';
+  h+='<div class="field"><label>📡 מקור ליד</label><div class="val">'+(d.ls||'-')+'</div></div>';
+  h+='<div class="field"><label>🏥 בריאות</label><div class="val">'+hc+'</div></div>';
+  if(d.nt)h+='<div class="note-box"><label>📝 הערות</label><div style="color:#eab308">'+E(d.nt)+'</div></div>';
+  if(d.cp)h+='<div class="note-box"><label>⭐ מועדפים</label><div style="color:#06b6d4">'+E(d.cp)+'</div></div>';
+  if(d.cb)h+='<div class="note-box"><label>🚫 חסומים</label><div style="color:#ef4444">'+E(d.cb)+'</div></div>';
+  if(d.pf)h+='<div class="note-box"><label>🤖 AI</label><div style="color:#ec4899">'+E(d.pf)+'</div></div>';
+  h+='</div><div class="actions">';
+  h+='<a class="wa-btn" style="padding:8px 18px;font-size:13px" href="https://wa.me/'+(d.w||'')+'?text='+encodeURIComponent('היי '+d.n+', כאן getjob! 😊')+'" target="_blank">📱 WhatsApp</a>';
+  if(d.e)h+='<a class="csv-btn" style="background:#3b82f6" href="mailto:'+E(d.e)+'" target="_blank">📧 אימייל</a>';
+  h+='</div>';
+  document.getElementById('modal').innerHTML=h;
+  document.getElementById('overlay').classList.add('show');
+}
+function closeModal(){document.getElementById('overlay').classList.remove('show')}
+document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+
+function debounce(fn,ms){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}}
+document.querySelectorAll('[data-s]').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('[data-s]').forEach(x=>x.classList.remove('on'));b.classList.add('on');st=b.dataset.s;applyFilters()})});
+document.getElementById('searchMain').addEventListener('input',debounce(applyFilters,300));
+document.getElementById('filterRole').addEventListener('input',debounce(applyFilters,300));
+document.getElementById('filterClient').addEventListener('input',debounce(applyFilters,300));
+['filterRegion','filterGender','filterCar','filterStar'].forEach(id=>document.getElementById(id).addEventListener('change',applyFilters));
+document.getElementById('filterBday').addEventListener('change',applyFilters);
+document.getElementById('clearAll').addEventListener('click',()=>{
+  document.getElementById('searchMain').value='';document.getElementById('filterRole').value='';document.getElementById('filterClient').value='';
+  ['filterRegion','filterGender','filterCar','filterStar'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('filterBday').checked=false;
+  document.querySelectorAll('[data-s]').forEach(b=>b.classList.remove('on'));document.querySelector('[data-s="all"]').classList.add('on');
+  st='all';sf=null;applyFilters();
+});
+document.querySelectorAll('th[data-sort]').forEach(th=>th.addEventListener('click',()=>{const f=th.dataset.sort;if(sf===f)sd*=-1;else{sf=f;sd=1}applyFilters()}));
+document.getElementById('exportCSV').addEventListener('click',()=>{
+  const hd=['שם','סטטוס','אזור','עיר','ת.ז','טלפון','התמחות','עבד_כ','משמרות','שעות','דירוג','לקוחות','הערות','מועדפים','חסומים','AI','פעילות','קטין','יומהולדת','אימייל'];
+  let csv='\ufeff'+hd.join(',')+' \n';
+  F.forEach(d=>{csv+=[d.n,d.s,d.rg||'',d.c||'',d.id||'',d.p||'','"'+(d._sp||'')+'"','"'+(d._tr||'')+'"',d._ts||'',d._th||'',d._st||'','"'+(d._tc||'')+'"','"'+(d.nt||'').replace(/"/g,'""').replace(/\n/g,' ')+'"','"'+(d.cp||'')+'"','"'+(d.cb||'')+'"','"'+(d.pf||'')+'"',d.la||'',d.mn?'כן':'לא',d.bm?d.bd:'',d.e||''].join(',')+' \n'});
+  const b=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='getjob_'+new Date().toISOString().split('T')[0]+'.csv';a.click();
+});
+document.addEventListener('keydown',e=>{if(e.key==='/'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)){e.preventDefault();document.getElementById('searchMain').focus()}});
+
+// ===== LIVE DATA: Fetch new employees from Google Sheets =====
+const API_URL = 'https://script.google.com/macros/s/AKfycbzrfLZsuxVMbAh3qux5tEZUtcDyZOsIYh0WQ85hDSk2pNTEYHfkaBupnZcYyy71KUY/exec';
+
+async function fetchNewEmployees() {
+  try {
+    const res = await fetch(API_URL);
+    const json = await res.json();
+    if (!json.data || !json.data.length) return 0;
+
+    // Build lookup of existing phones → index in D
+    const phoneIndex = {};
+    const idIndex = {};
+    D.forEach((d, idx) => {
+      if (d.p) phoneIndex[d.p.replace(/[\s\-]/g, '')] = idx;
+      if (d.id) idIndex[d.id] = idx;
+    });
+
+    let added = 0, updated = 0;
+    json.data.forEach(emp => {
+      // Fix gender: Apps Script sends 'male'/'female', dashboard uses Hebrew
+      if (emp.g === 'male') emp.g = 'זכר';
+      else if (emp.g === 'female') emp.g = 'נקבה';
+
+      // Ensure status
+      if (!emp.s) emp.s = 'חדש';
+
+      // Check if already exists
+      const normPhone = (emp.p || '').replace(/[\s\-]/g, '');
+      let existIdx = -1;
+      if (normPhone && phoneIndex[normPhone] !== undefined) existIdx = phoneIndex[normPhone];
+      else if (emp.id && idIndex[emp.id] !== undefined) existIdx = idIndex[emp.id];
+
+      if (existIdx >= 0) {
+        // Update existing record: set status to חדש and merge new data
+        D[existIdx].s = 'חדש';
+        if (emp.cr) D[existIdx].cr = emp.cr;
+        if (emp.g) D[existIdx].g = emp.g;
+        if (emp.r) D[existIdx].r = emp.r;
+        if (emp.c) D[existIdx].c = emp.c;
+        if (emp.rg) D[existIdx].rg = emp.rg;
+        if (emp.e) D[existIdx].e = emp.e;
+        if (emp.nt) D[existIdx].nt = emp.nt;
+        if (emp.v) D[existIdx].v = emp.v;
+        if (emp.ex) D[existIdx].ex = emp.ex;
+        D[existIdx].src = 'sheet';
+        updated++;
+      } else {
+        // New employee — add to dataset
+        D.push(emp);
+        if (normPhone) phoneIndex[normPhone] = D.length - 1;
+        if (emp.id) idIndex[emp.id] = D.length - 1;
+        added++;
+      }
+    });
+
+    return added + updated;
+  } catch (err) {
+    console.error('Sheet API error:', err);
+    return 0;
+  }
+}
+
+// Init: load base data, then fetch new, then render
+applyFilters();
+
+fetchNewEmployees().then(added => {
+  if (added > 0) {
+    applyFilters();
+    // Show notification
+    const note = document.createElement('div');
+    note.style.cssText = 'position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#22c55e;color:#fff;padding:8px 20px;border-radius:8px;font-size:13px;z-index:999;animation:fadeOut 3s forwards';
+    note.textContent = '✅ סונכרנו ' + added + ' עובדים מ-Google Sheets';
+    document.body.appendChild(note);
+    setTimeout(() => note.remove(), 4000);
+  }
+});
+
+
+// ===== DYNAMIC LOAD: fetch workers.json on page load =====
+async function loadWorkers() {
+  try {
+    const url = 'workers.json?_t=' + Date.now();
+    const r = await fetch(url, { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    D.length = 0;
+    for (const w of data) D.push(w);
+    console.log('[bi] loaded ' + D.length + ' workers');
+    if (typeof applyFilters === 'function') applyFilters();
+    if (typeof updateStats === 'function') updateStats();
+  } catch (err) {
+    console.error('[bi] failed to load workers.json:', err);
+    document.body.insertAdjacentHTML('afterbegin',
+      '<div style="background:#dc2626;color:#fff;padding:14px;text-align:center;font-family:sans-serif">' +
+      '⚠️ שגיאה בטעינת נתונים: ' + (err.message || err) + '</div>');
+  }
+}
+loadWorkers();
+</script>
+</body>
+</html>
